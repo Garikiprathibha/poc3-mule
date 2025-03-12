@@ -1,0 +1,9 @@
+Insert:
+  query: "INSERT INTO employee_table_636(EmpId, EmpFirstName, EmpLastName, EmpRole, EmpDept, EmpPackage, EmpJoinDate, TaxDeduction, CurrentExperience, EmployeeGrade, employeeMobile, employeeEmail, TaxDeductPercentage)
+         VALUES(:EmpId, :EmpFirstName, :EmpLastName, :EmpRole, :EmpDept, :EmpPackage, :EmpJoinDate, :TaxDeduction, :CurrentExperience, :EmployeeGrade, :employeeMobile, :employeeEmail, :TaxDeductPercentage)"
+Select:
+  query: "SELECT * FROM employee_table_636"
+SelectById: 
+  query: "SELECT * FROM employee_table_636 where EmpId = :id"
+Delete:
+  query: "DELETE FROM employee_table_636 where EmpId = :id"

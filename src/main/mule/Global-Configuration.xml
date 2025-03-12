@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a3f239ea-78bc-4b49-be6c-acb44207678b" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="0f2cbb77-a331-4da3-a6ef-90c8585156d4" >
+		<http:request-connection protocol="HTTPS" host="emp-mgnt-bq4opq.5sc6y6-4.usa-e2.cloudhub.io"/>
+	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="973346d6-1ce2-4ca0-9208-26ada51e8c59" file="qa\app.properties" />
+	<apikit:config outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" doc:name="Router" doc:id="81c5eb57-7985-4745-8936-6817bf2d677f" name="empmgnt-p-api-config" api="resource::f4731cab-71bc-4a83-9240-af72ae2b9684:empmgnt-p-api:1.0.0:raml:zip:empmgnt-p-api.raml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="3117501d-0705-4a0c-87f8-4decd82708c8" file="sql\query.yaml" />
+	<global-property doc:name="Global Property" doc:id="57fdb08b-c051-42a7-9d0e-d464cd27fd43" name="mule.env.key" value="qa" />
+	<api-gateway:autodiscovery apiId="20247304" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="8803c9dc-b423-409e-9e02-428bd6d73ac3" flowRef="empmgnt-p-api-main" />
+</mule>

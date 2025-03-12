@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="empmgnt-p-api-main">
+        <http:listener path="${http.path}" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="empmgnt-p-api-config"/>
+		<error-handler ref="Global-Error-HandlerError_Handler" />
+    </flow>
+    <flow name="empmgnt-p-api-console">
+        <http:listener path="/console/*" config-ref="HTTP_Listener_config">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="empmgnt-p-api-config"/>
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="delete:\employees\(id):empmgnt-p-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="2c4c985c-e6f8-4d93-9769-e4056030c99a" message='#["starting of the delete flow"]'/>
+		<flow-ref doc:name="Flow Reference" doc:id="324c86e9-2cef-4945-b901-a9581c7755a5" name="delete:\employees\(id)Sub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e61bd9c5-d33d-4cc7-9f97-32840cbd4ecf" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="8d59d8bd-c01c-4e4f-a4d4-2fa0684db6d2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  status: "Success",
+  message: "Employee record deleted successfully"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+    <flow name="get:\employees:empmgnt-p-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="3061d00c-192a-4579-ba12-0a9951de60ab" />
+		<flow-ref doc:name="Flow Reference" doc:id="22c4055b-1e8b-4c72-8ebd-c0f72d580a7f" name="get:\employeesSub_Flow1"/>
+		<logger level="INFO" doc:name="endOfTheFlow" doc:id="8803df0c-da0c-4054-bbab-4f17a26b9af4" />
+    </flow>
+    <flow name="get:\employees\(id):empmgnt-p-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="1120d0b2-9d68-42b2-9c9c-8436fba689e1" />
+		<flow-ref doc:name="Flow Reference" doc:id="0a59bdf2-5fdc-4d93-92cc-4824b124ead8" name="get:\employees\(id)Sub_Flow2"/>
+		<logger level="INFO" doc:name="endOfTheFlow" doc:id="63405a48-9b6b-464c-b31b-11edb3454786" />
+    </flow>
+	<flow name="post:\employees:application\json:empmgnt-p-api-config">
+        <logger level="INFO" doc:name="Logger" doc:id="5e8bf35e-59ef-4efd-92bd-e5d20a048fc9" message="#[payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="9114f563-d84e-47ff-81f9-dd8515f48ed9" name="post:\employeesSub_Flow3"/>
+		<logger level="INFO" doc:name="endOfTheFlow" doc:id="17883d38-3baa-4dfc-96c0-0e98c4dd467f" message="#[payload]"/>
+    </flow>
+</mule>

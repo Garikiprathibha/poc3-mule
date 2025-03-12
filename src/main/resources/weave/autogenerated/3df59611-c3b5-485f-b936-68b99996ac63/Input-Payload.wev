@@ -1,0 +1,15 @@
+%dw 2.0
+
+type auto_3df59611_c3b5_485f_b936_68b99996ac63_Input_Payload = {
+  EmpRole?: String, 
+  EmpFirstName?: String, 
+  EmpDept?: "PMO" | "Finance" | "Hr" | "Delivery" | "L&D" | "Admin", 
+  employeeEmail?: String, 
+  employeeMobile?: String, 
+  EmpId?: Number, 
+  EmpLastName?: String, 
+  EmpPackage?: String, 
+  EmpJoinDate?: String, 
+  _?: Any
+}
+

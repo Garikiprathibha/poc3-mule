@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="delete:\employees\(id)Sub_Flow" doc:id="8dafa611-3ed1-4d2b-994c-88143e669171" >
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="10ba7064-adb6-46e9-8996-b0afd884184e" >
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[attributes.uriParams.'id'&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform> [STUDIO] -->
+		<http:request method="DELETE" doc:name="Requesting to sapi delete flow" doc:id="2196b92c-c4bf-4740-87ab-2729f8a42e5a" responseTimeout="${request.responsetimeout}" config-ref="HTTP_Request_configuration" path="${request.path}">
+			<http:headers><![CDATA[#[{
+	"query": p('Delete.query')
+}]]]></http:headers>
+			<http:query-params><![CDATA[#[{
+	"id":attributes.uriParams.id
+}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="get:\employeesSub_Flow1" doc:id="b041fba6-2bb9-40b1-b823-efe118657914" >
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="2c13c80e-e078-4a21-8f27-715dcfa423ca" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+[
+  {
+    EmpId: 1,
+    EmpFirstName: "John",
+    EmpLastName: "wesly",
+    EmpRole: "Developer",
+    EmpDept: "Delivery",
+    EmpPackage: "11 Lpa",
+    EmpJoinDate: "8-jan-2020",
+    employeeMobile: "9876543210",
+    employeeEmail: "johnwesly@gmail.com",
+    EmployeeGrade: "B2",
+    CurrentExperience: "5 years",
+    TaxDeduction: "15%"
+  }
+&#93; as Array {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform> [STUDIO] -->
+		<set-variable value='#[attributes.headers."Content-Type"]' doc:name="Set Variable" doc:id="85575b8b-079c-4ca1-bfb8-52c8ea598505" variableName="content-type"/>
+		<http:request method="GET" doc:name="Requesting to sapi get flow" doc:id="4309954b-cf87-419a-854b-18e68a5564a1" responseTimeout="${request.responsetimeout}" config-ref="HTTP_Request_configuration" path="${request.path}">
+			<http:headers><![CDATA[#[{
+	"query": p('Select.query'),
+	"content-type": attributes.headers."content-type"
+}]]]></http:headers>
+		</http:request>
+		<choice doc:name="Choice" doc:id="0b20d3c8-48c1-4442-8441-38ebdbb18537" >
+			<when expression="#[vars.&quot;content-type&quot; == 'application/json']">
+				<ee:transform doc:name="Transform Message" doc:id="bbe812e7-7036-47d2-9d8f-cab9e6d37dc9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="597bf575-576c-4e02-82f2-f5aa5d44bd5f" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+{
+  employees: {
+    employee: payload map (emp) -> {
+      EmpId: emp.EmpId,
+      EmpFirstName: emp.EmpFirstName,
+      EmpLastName: emp.EmpLastName,
+      EmpRole: emp.EmpRole,
+      EmpDept: emp.EmpDept,
+      EmpPackage: emp.EmpPackage,
+      EmpJoinDate: emp.EmpJoinDate,
+      TaxDeduction: emp.TaxDeduction,
+      CurrentExperience:emp.CurrentExperience,
+      EmployeeGrade: emp.EmployeeGrade,
+      employeeMobile: emp.employeeMobile,
+      employeeEmail: emp.employeeEmail,
+      TaxDeductPercentage: emp.TaxDeductPercentage
+    }
+  }
+}
+ 
+ ]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="get:\employees\(id)Sub_Flow2" doc:id="401c4c72-a41b-4974-b5e4-fb0069183069" >
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="051a07da-8207-4679-8aae-276804802908" >
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[attributes.uriParams.'id'&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform> [STUDIO] -->
+		<choice doc:name="Choice" doc:id="d0ad4f96-788b-4483-8c0a-91ba400582ca">
+			<when expression="#[attributes.uriParams.id &gt;= 0 and attributes.uriParams.id &lt;= 9]">
+				<set-variable value='#[attributes.headers."Content-Type"]' doc:name="Set Variable" doc:id="f7bd039f-6817-4dc1-9055-28fb0de72be1" variableName="content-type" />
+					<http:request method="GET" doc:name="Requesting to sapi get flow" doc:id="b62408ff-1fea-470a-b8e5-5d025ee87d27" path="${request.path}" responseTimeout="${request.responsetimeout}" config-ref="HTTP_Request_configuration">
+			<http:headers><![CDATA[#[{
+	"query": p('SelectById.query'),
+	"content-type": attributes.headers.`content-type`
+}]]]></http:headers>
+			<http:query-params><![CDATA[#[{
+	"id":attributes.uriParams.id	
+}]]]></http:query-params>
+		</http:request>
+					<choice doc:name="Choice" doc:id="b68086de-b91b-4cc4-bf02-c70eba89700d">
+						<when expression="#[vars.&quot;content-type&quot; == 'application/json']">
+							<ee:transform doc:name="Transform Message" doc:id="42381a40-f5fb-4f87-8d1e-0b9ae695828e">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</when>
+						<otherwise>
+							<ee:transform doc:name="Transform Message" doc:id="e1955f74-05b2-4b4c-a786-18d0b41977b9">
+								<ee:message>
+									<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+---
+{
+	"employee": payload
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</otherwise>
+					</choice>
+			</when>
+			<otherwise>
+				<raise-error doc:name="Raise error" doc:id="95c3af16-733b-4909-978c-644bbcc1b4fc" type="VALIDATION:ID_NOT_FOUND" description='"Employee not found"' />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="post:\employeesSub_Flow3" doc:id="3df59611-c3b5-485f-b936-68b99996ac63" >
+		<ee:transform doc:name="formating the payload" doc:id="8db20be7-8769-4cd8-83b0-b46e1d9f6877">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ 
+var currentDate = now() as Date
+ 
+// Extract year and month
+var currentYear = currentDate.year
+var joinYear = payload.EmpJoinDate.year
+var years = currentYear - joinYear
+ 
+var currentMonth = currentDate.month
+var joinMonth = payload.EmpJoinDate.month
+var months = currentMonth - joinMonth
+ 
+// Adjust for negative months
+var adjustedYears = if (months < 0) years - 1 else years
+var adjustedMonths = if (months < 0) 12 + months else months
+var experience = adjustedYears ++ " years, " ++ adjustedMonths ++ " months"
+ 
+// Assigning grade based on experience
+var grade =
+    if (adjustedYears >= 15) "A"
+    else if (adjustedYears >= 11) "A1"
+    else if (adjustedYears >= 7) "A2"
+    else if (adjustedYears >= 4) "B1"
+    else "B2"
+ 
+// Employee salary package (assumed in LPA)
+var empPackage = splitBy(payload.EmpPackage," ")[0] as Number // Example: 11 LPA
+ 
+// Tax deduction based on package slabs
+var taxPercentage =
+    if (empPackage >= 20) "30%"
+    else if (empPackage >= 15) "25%"
+    else if (empPackage >= 10) "20%"
+    else if (empPackage >= 5) "15%"
+    else "10%"
+ 
+// Calculating tax amount in LPA
+var taxDeducted = ((empPackage * (taxPercentage replace "%" with "" )as Number) / 100) as String
+ 
+---
+{
+		"EmpId":payload.EmpId,
+		"EmpFirstName":payload.EmpFirstName,
+		"EmpLastName":payload.EmpLastName,
+		"EmpRole":payload.EmpRole,
+		"EmpDept":payload.EmpDept,
+		"employeeMobile":payload.employeeMobile,
+		"employeeEmail":payload.employeeEmail,
+		"EmpPackage":payload.EmpPackage,
+		"TaxDeduction":taxDeducted,
+		"TaxDeductPercentage":taxPercentage,
+		"EmpJoinDate":payload.EmpJoinDate,
+		"CurrentExperience":experience,
+		"EmployeeGrade":grade
+	}
+ 
+ ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="calling the sql queries.poperties" doc:id="8dea9a23-c4f1-46ae-b4b5-2ecaf355d5d4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"query": Mule::p('Insert.query'),
+	"body": payload
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Requesting to sapi post flow" doc:id="4af9b5a1-4d29-4ff4-a940-35e60c8eed06" path="${request.path}" responseTimeout="${request.responsetimeout}" config-ref="HTTP_Request_configuration" />
+		<ee:transform doc:name="Transform Message" doc:id="29dbd3c9-e62a-42df-8738-e02aeb780fba">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  status: "success",
+  message: "employee created successfully"
+} as Object {encoding: "UTF-8", mediaType: "application/json"}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
